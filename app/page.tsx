@@ -22,20 +22,24 @@ export default function Home() {
   useEffect(() => {
     const initSynth = async () => {
       await Tone.start()
-      
+
       const reverb = new Tone.Reverb(2)
       const delay = new Tone.Delay(0.5)
-      
+
+      // Set initial wet/dry mix values
+      reverb.wet.value = reverbWet
+      delay.wet.value = delayWet
+
       reverb.toDestination()
       delay.connect(reverb)
-      
+
       const synth = new Tone.Synth({
         oscillator: { type: oscType },
         envelope: adsr,
       }).connect(delay)
-      
+
       synth.volume.value = volume
-      
+
       synthRef.current = synth
       reverbRef.current = reverb
       delayRef.current = delay
@@ -76,9 +80,15 @@ export default function Home() {
         setAdsr(value)
         break
       case 'reverbWet':
+        if (reverbRef.current) {
+          reverbRef.current.wet.value = value
+        }
         setReverbWet(value)
         break
       case 'delayWet':
+        if (delayRef.current) {
+          delayRef.current.wet.value = value
+        }
         setDelayWet(value)
         break
     }
